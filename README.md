@@ -13,6 +13,7 @@ Components
 -----------
 * Position tracking using active-IR markers and IR-filtered cameras
 * Streaming real-life video (mjpegstreamer?)
+* Physical rig for camera setup above Sumo ring
 * Visualization using JavaScript+WebGL
 * Streaming of robot sensory data and state from the firmware
 * Streaming commands to the robot
@@ -20,16 +21,18 @@ Components
 Milestones
 --------------
 
-**0.0.1: 3d cube following robot overlayed on real video stream**
+**0.0.1: Proof-of-concept. 3d cube following robot overlayed on real video stream**
 
 * Allow to set height, calibrate the IR-camera view and real video to eachother
 * Stream the coordinates from OpenCV-based detector over HTTP/WS
 * Map the video and IR-coordinates into a 3d model (three.js?)
 * Draw a 3d cube of robot at position given by tracking and configured height
 
-**Next**
+**0.1.0: Minimally useful. Basic robot control and visualizations of sensory input**
 
 * Correction of lens projection, to get uniform spacing in the plane
-* Use multiple markers per robot, in a shape (L or _|_) that allows detecting orientation
-* Visualize and overlay sensor data from robot into 3d view.
+* Use multiple markers per robot, in a shape (L or _ | _) that allows detecting orientation
+* Visualize and overlay sensor data from robot into 3d view: Opponent and line detection
+* Ability to control robot from IDE
+
 
