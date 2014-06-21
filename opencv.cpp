@@ -58,9 +58,18 @@ int main() {
         // Visualize
         cv::drawKeypoints(thresholded, keyPoints, out, CV_RGB(0,255,0), cv::DrawMatchesFlags::DEFAULT);
 
+        const float robotSize = 20;
+        for (int i=0; i<keyPoints.size(); i++) {
+            const cv::KeyPoint &kp = keyPoints[i];
+            cv::Point topRight(kp.pt.x-(robotSize/2), kp.pt.y-robotSize/2);
+            cv::Point bottomLeft(kp.pt.x+(robotSize/2), kp.pt.y+(robotSize/2));
+            cv::rectangle(out, topRight, bottomLeft, 0xFF00FF);
+        }
+
         cv::imshow("cam", out);
         if (cv::waitKey(30) >= 0)
             break;
     }
     return 0;
 }
+
