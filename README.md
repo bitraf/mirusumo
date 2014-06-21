@@ -1,6 +1,14 @@
 Research in next-generation tools for developing smart physical devices and 
 autonomous robots - with Sumorobots as a case-study.
 
+Some of these ideas closely mirror what [Brett Victor](http://worrydream.com/)
+argues for in [Seeing spaces](http://vimeo.com/97903574). The project can be seen
+as possible practical research in realizing these, shaped by the special case of Sumo robot fighting.
+
+Status
+--------
+*Prototyping*. Active IR-tracking has working prototype.
+
 Components
 -----------
 * Position tracking using active-IR markers and IR-filtered cameras
