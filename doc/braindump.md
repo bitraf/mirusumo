@@ -91,3 +91,11 @@ Can use blob or Houghcircles from OpenCV to track IR points.
 * https://code.google.com/p/touchlib/
 TODO: figure out how to calculate orientation.
 
+
+Related research
+==================
+
+* [Phybots](http://junkato.jp/phybots/), robotics toolkit based on ceiling mounted camera
+* [RoboTable: An Infrastructure for Intuitive Interaction with Mobile Robots in a Mixed-Reality Environment]
+(http://www.hindawi.com/journals/ahci/2012/301608/)
+
