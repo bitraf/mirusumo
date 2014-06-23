@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
 
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -13,10 +14,58 @@ static const double std_dev     = 1.5;
 static const int    block_size  = 47;
 static const int    fc          = -5; 
 
+enum VisualizationMode {
+    RealVideoOnly = 0,
+    IrVideoOnly,
+    FilteredIrOnly,
+    CombinedRealAndIr,
+    CombinedRealAndTrackpoints,
+    VisualizationModes
+};
+
+void visualize(const cv::Mat &real, const cv::Mat &ir, const cv::Mat &filteredIr,
+               const std::vector<cv::KeyPoint> &keyPoints, VisualizationMode mode)
+{
+    const float robotSize = 20;
+    cv::Mat bwReal, out;
+
+    switch (mode) {
+    case RealVideoOnly:
+        cv::imshow("cam", real);
+        break;
+    case IrVideoOnly:
+        cv::imshow("cam", ir);
+        break;
+    case FilteredIrOnly:
+        cv::imshow("cam", filteredIr);
+        break;
+    case CombinedRealAndIr:
+        cv::cvtColor(real, bwReal, CV_BGR2GRAY);
+        cv::addWeighted(bwReal, 0.8, filteredIr, 0.7, 0.0, out);
+        cv::imshow("cam", out);
+        break;
+    case CombinedRealAndTrackpoints:
+        cv::drawKeypoints(real, keyPoints, out, CV_RGB(0,255,0), cv::DrawMatchesFlags::DEFAULT);
+        for (int i=0; i<keyPoints.size(); i++) {
+            const cv::KeyPoint &kp = keyPoints[i];
+            cv::Point topRight(kp.pt.x-(robotSize/2), kp.pt.y-robotSize/2);
+            cv::Point bottomLeft(kp.pt.x+(robotSize/2), kp.pt.y+(robotSize/2));
+            cv::rectangle(out, topRight, bottomLeft, 0xFF00FF);
+        }
+        cv::imshow("cam", out);
+        break;
+    default:
+        throw std::runtime_error("Invalid visualization mode");
+    }
+}
+
+// FIXME: implement camera offset calibration
+// TODO: allow to configure which stream is what
 int main() {
-    cv::VideoCapture stream1(0);
+    cv::VideoCapture irStream(0);
+    cv::VideoCapture realStream(1);
      
-    if (!stream1.isOpened()) {
+    if (!irStream.isOpened() || !realStream.isOpened()) {
         std::cout << "cannot open camera";
     }
 
@@ -41,11 +90,14 @@ int main() {
     std::vector<cv::KeyPoint> keyPoints;
     std::vector<std::vector <cv::Point> > contours;
 
+    VisualizationMode mode = RealVideoOnly;
     while (true) {
-        cv::Mat in, filtered, blurred, balanced, thresholded, out;
-        stream1.read(in);
+        cv::Mat in, filtered, blurred, balanced, thresholded, real;
 
-        // Filter    
+        irStream.read(in);
+        realStream.read(real);
+
+        // Process/filter    
         cv::cvtColor(in, filtered, CV_BGR2GRAY);
         cv::GaussianBlur(filtered, blurred, cv::Size(kernel_size, kernel_size), std_dev, std_dev);
 //        cv::bsdiff(blurred, balanced, gaussian_frame);
@@ -56,19 +108,18 @@ int main() {
         blobDetector.detect(thresholded, keyPoints);
 
         // Visualize
-        cv::drawKeypoints(thresholded, keyPoints, out, CV_RGB(0,255,0), cv::DrawMatchesFlags::DEFAULT);
+        visualize(real, in, thresholded, keyPoints, mode);
 
-        const float robotSize = 20;
-        for (int i=0; i<keyPoints.size(); i++) {
-            const cv::KeyPoint &kp = keyPoints[i];
-            cv::Point topRight(kp.pt.x-(robotSize/2), kp.pt.y-robotSize/2);
-            cv::Point bottomLeft(kp.pt.x+(robotSize/2), kp.pt.y+(robotSize/2));
-            cv::rectangle(out, topRight, bottomLeft, 0xFF00FF);
-        }
-
-        cv::imshow("cam", out);
-        if (cv::waitKey(30) >= 0)
+        const char key = cv::waitKey(30);
+        switch (key) {
+        case 's':
+            mode = (VisualizationMode)(mode+1);
+            if (mode >= VisualizationModes) {
+                mode = (VisualizationMode)0;
+            }
+        default:
             break;
+        };
     }
     return 0;
 }
