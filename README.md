@@ -14,7 +14,9 @@ Components
 * Position tracking using active-IR markers and IR-filtered cameras
 * Streaming real-life video (mjpegstreamer?)
 * Physical rig for camera setup above Sumo ring
-* Visualization using JavaScript+WebGL
+* 3d visualization using JavaScript+WebGL
+* Sensor/data visualization timeline using JavaScript
+* Timeline syncronization based on sensor stream and video marker
 * Streaming of robot sensory data and state from the firmware
 * Streaming commands to the robot
 
@@ -36,3 +38,13 @@ Milestones
 * Ability to control robot from IDE
 
 
+Build & run
+------------
+
+Only tested on Linux.
+
+Have /dev/video0 be a IR camera, and /dev/video1 be a visible spectrum camera
+    
+    g++ -o opencv opencv.cpp `pkg-config --cflags --libs opencv` && ./opencv
+
+Need to have OpenCV installed.

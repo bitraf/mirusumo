@@ -92,6 +92,12 @@ Can use blob or Houghcircles from OpenCV to track IR points.
 TODO: figure out how to calculate orientation.
 
 
+Lessons learned
+================
+* Floppy disk slices can be used as a simple IR filter
+* When using cheap webcams on Linux with raw YUV streams @640x480, can only fit one per USB host
+
+
 Related research
 ==================
 
