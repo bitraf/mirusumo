@@ -22,41 +22,66 @@ enum VisualizationMode {
     CombinedRealAndTrackpoints,
     VisualizationModes
 };
+static const char *modeNames[VisualizationModes] = {
+    "real",
+    "IR",
+    "filtered IR",
+    "B/W & IR",
+    "real & trackpoints"
+};
 
-void visualize(const cv::Mat &real, const cv::Mat &ir, const cv::Mat &filteredIr,
+
+void visualize(cv::Mat &real, cv::Mat &ir, cv::Mat &filteredIr,
                const std::vector<cv::KeyPoint> &keyPoints, VisualizationMode mode)
 {
     const float robotSize = 20;
-    cv::Mat bwReal, out;
+    cv::Mat bwReal, temp;
+    cv::Mat &out = real;
 
     switch (mode) {
     case RealVideoOnly:
-        cv::imshow("cam", real);
+        out = real;
         break;
     case IrVideoOnly:
-        cv::imshow("cam", ir);
+        out = ir;
         break;
     case FilteredIrOnly:
-        cv::imshow("cam", filteredIr);
+        out = filteredIr;
         break;
     case CombinedRealAndIr:
         cv::cvtColor(real, bwReal, CV_BGR2GRAY);
-        cv::addWeighted(bwReal, 0.8, filteredIr, 0.7, 0.0, out);
-        cv::imshow("cam", out);
+        cv::addWeighted(bwReal, 0.8, filteredIr, 0.7, 0.0, temp);
+        cv::imshow("cam", temp);
+        out = temp;
         break;
     case CombinedRealAndTrackpoints:
-        cv::drawKeypoints(real, keyPoints, out, CV_RGB(0,255,0), cv::DrawMatchesFlags::DEFAULT);
+        cv::drawKeypoints(real, keyPoints, temp, CV_RGB(0,255,0), cv::DrawMatchesFlags::DEFAULT);
         for (int i=0; i<keyPoints.size(); i++) {
             const cv::KeyPoint &kp = keyPoints[i];
             cv::Point topRight(kp.pt.x-(robotSize/2), kp.pt.y-robotSize/2);
             cv::Point bottomLeft(kp.pt.x+(robotSize/2), kp.pt.y+(robotSize/2));
-            cv::rectangle(out, topRight, bottomLeft, 0xFF00FF);
+            cv::rectangle(temp, topRight, bottomLeft, 0xFF00FF);
         }
-        cv::imshow("cam", out);
+        out = temp;
         break;
     default:
         throw std::runtime_error("Invalid visualization mode");
     }
+
+    // Show which mode is active
+    std::string text(modeNames[mode]);
+    const int fontFace = cv::FONT_HERSHEY_PLAIN;
+    const double fontScale = 2.5;
+    const int thickness = 2;
+    int baseline=0;
+    cv::Size textSize = cv::getTextSize(text, fontFace,
+                          fontScale, thickness, &baseline);
+    cv::Point textOrg((out.cols - textSize.width)/2,
+                  (out.rows - textSize.height)/2);
+    cv::putText(out, text, textOrg, fontFace, fontScale,
+        cv::Scalar::all(255), thickness, 8);
+
+    cv::imshow("cam", out);
 }
 
 // FIXME: implement camera offset calibration
