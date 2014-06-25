@@ -96,7 +96,7 @@ Lessons learned
 ================
 * Floppy disk slices can be used as a simple IR filter
 * When using cheap webcams on Linux with raw YUV streams @640x480, can only fit one per USB host
-
+* Do not put IR filter on back of lens, it spreads the light too much. Should instead go in front
 
 Related research
 ==================
