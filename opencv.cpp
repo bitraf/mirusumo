@@ -77,7 +77,7 @@ void visualize(cv::Mat &real, cv::Mat &ir, cv::Mat &filteredIr,
     cv::Size textSize = cv::getTextSize(text, fontFace,
                           fontScale, thickness, &baseline);
     cv::Point textOrg((out.cols - textSize.width)/2,
-                  (out.rows - textSize.height)/2);
+                  (out.rows - textSize.height));
     cv::putText(out, text, textOrg, fontFace, fontScale,
         cv::Scalar::all(255), thickness, 8);
 
